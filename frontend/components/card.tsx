@@ -2,18 +2,20 @@ import React from "react";
 import styles from '../styles/Home.module.css'
 
 interface propInterface{
-    title: string | null,
-    descript: string | null,
-    type? : string | null
+    title: string,
+    descript: string,
+    type? : string
 }
 
 
 export default function Card(props: propInterface){
+    const descriptions : string = props.descript;
+    const newDescript : any = descriptions?.split('\n').map(str => <p key={str+"Card"}>{str}</p>);
 return( 
     <React.Fragment>
         <span className={styles.card}>
             <h2>{props.title} &rarr;</h2>
-            <p>{props.descript}</p>
+            <div>{newDescript}</div>
         </span>
     </React.Fragment>
     )

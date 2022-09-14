@@ -9,7 +9,5 @@ const headers:HeadersInit = {
 
 export const getAllFilms:RequestHandler = async (req, res, next) => {
     const films =  await axios.get('https://raw.githubusercontent.com/erik-sytnyk/movies-list/master/db.json',{headers});
-    console.log(films);
     res.status(200).send(films.data);
-    
 }
