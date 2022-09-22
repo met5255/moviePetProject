@@ -5,22 +5,41 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from '../styles/Home.module.css'
-import Card from '../components/card' ;
+import Card from '../components/card';
+import Pagination from '@mui/material/Pagination';
+import React from 'react';
 
 export async function getServerSideProps() {
-
   const resultMovies = await fetch('http://localhost:3001/api/v1/films/get-all-films')
   const data = await resultMovies.json()
   // Pass data to the page via props
   return { props: { data } };
 }
 
+
+type movieType ={
+  director: string,
+  year: string,
+  genres: string[],
+  title: string,
+}
+
 const Home: NextPage = (props : any) => {
-  const renderCards = () =>{
+  const [movies, setMovies] = React.useState(props.data.movies);
+
+  async function getMoviesWithPagination(pageNumber: number) {
+    const pageToRequest = pageNumber - 1;
+    const resultMovies = await fetch(`http://localhost:3001/api/v1/films/get-all-films/${pageToRequest}`)
+    const data = resultMovies.json()
+    setMovies(data)
+  }
+
+  const renderCards = () => {
     const filmsCardArray : any = [];
-    props.data.movies.forEach(e => {
-      const desc =  `Director: ${e.director} \n Year: ${e.year} \n Category: ${e.genres.join(', ')} `
-      filmsCardArray.push(<Card key={`${e.title}`} title={`${e.title}`} descript={desc}/>)
+    console.log('props', movies);
+    movies.forEach((movie: movieType) => {
+      const desc =  `Director: ${movie.director} \n Year: ${movie.year} \n Category: ${movie.genres.join(', ')} `
+      filmsCardArray.push(<Card key={`${movie.title}`} title={`${movie.title}`} descript={desc}/>)
     })
     return filmsCardArray;
   }
@@ -50,6 +69,7 @@ const Home: NextPage = (props : any) => {
 
         <div className={styles.grid}>
           {renderCards()}
+          <Pagination count={5} variant="outlined" color="secondary" />
         </div>
       </main>
 
