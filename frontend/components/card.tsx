@@ -10,10 +10,10 @@ interface propInterface{
 
 export default function Card(props: propInterface){
     const descriptions : string = props.descript;
-    const newDescript : any = descriptions?.split('\n').map(str => <p key={str+"Card"}>{str}</p>);
+    const newDescript: JSX.Element[] = descriptions?.split('\n').map(str => <p key={str+"Card"}>{str}</p>);
 return( 
     <React.Fragment>
-        <span className={styles.card}>
+        <span  className={styles.card}>
             <h2>{props.title} &rarr;</h2>
             <div>{newDescript}</div>
         </span>

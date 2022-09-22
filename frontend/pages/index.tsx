@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import React from 'react';
 import Head from 'next/head'
 import Image from 'next/image'
 import TextField from '@mui/material/TextField';
@@ -6,19 +7,49 @@ import Button from '@mui/material/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from '../styles/Home.module.css'
 import Card from '../components/card' ;
+import Pagination from '@mui/material/Pagination';
+import { relative } from 'path';
+import { Console } from 'console';
 
 export async function getServerSideProps() {
 
-  const resultMovies = await fetch('http://localhost:3001/api/v1/films/get-all-films')
+  const resultMovies = await fetch('http://localhost:3001/api/v1/films/get-all-films/0')
   const data = await resultMovies.json()
   // Pass data to the page via props
   return { props: { data } };
 }
 
+type movieItems = {
+  title: string,
+  director: string,
+  year: string,
+  genres: string [],
+}
+
 const Home: NextPage = (props : any) => {
+
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [movies, setMovies] = React.useState(props.data.movies);
+  
+  
+  const fetchMovies = async (page : number) => {
+    const getPage = page-1;
+    const resultMovies = await fetch(`http://localhost:3001/api/v1/films/get-all-films/${getPage}`)
+    const moviesData = await resultMovies.json()
+    setMovies(moviesData.movies)
+  }
+  
+  
+  const onChangpagination  = (event: React.ChangeEvent<unknown>, value: number) => {
+    fetchMovies(value);
+    setCurrentPage(value);
+  };
+
+
+
   const renderCards = () =>{
     const filmsCardArray : any = [];
-    props.data.movies.forEach(e => {
+    movies.forEach((e: movieItems) => {
       const desc =  `Director: ${e.director} \n Year: ${e.year} \n Category: ${e.genres.join(', ')} `
       filmsCardArray.push(<Card key={`${e.title}`} title={`${e.title}`} descript={desc}/>)
     })
@@ -50,6 +81,9 @@ const Home: NextPage = (props : any) => {
 
         <div className={styles.grid}>
           {renderCards()}
+          <div style={{width:'100%', position: 'relative', left:'40%'}}> 
+            <Pagination count={props.data.allPage} variant="outlined" color='primary' page={currentPage}  onChange={onChangpagination} />
+          </div>
         </div>
       </main>
 
